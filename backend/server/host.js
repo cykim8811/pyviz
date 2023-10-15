@@ -4,6 +4,7 @@ const server = require('http').createServer(app);
 const cors = require('cors');
 const socketIO = require('socket.io')(server, { cors: { origin: "*" } });
 
+const network = require('./network');
 
 // Browser side connection
 app.use(cors())
@@ -21,12 +22,11 @@ server.listen(port, () => {
 })
 
 
-const net = require('net');
-
-// TCP Server
-const hostServer = net.createServer((sock) => {
+const hostServer = network.createServer((sock) => {
     console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
-    sock.on('data', (data) => {
+    sock.emit('connect', sock.remoteAddress + ':' + sock.remotePort);
+    sock.on('message', (data) => {
+        sock.emit('echo', data);
         console.log('DATA ' + sock.remoteAddress + ': ' + data);
     });
     sock.on('close', (data) => {
@@ -35,7 +35,7 @@ const hostServer = net.createServer((sock) => {
 })
 
 hostServer.listen(7003, '127.0.0.1', () => {
-    console.log('TCP Server is running on port 7003.');
+    console.log('TCP Server is running on port 7003');
 });
 
 hostServer.on('error', (err) => {
