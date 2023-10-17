@@ -3,7 +3,6 @@ from network import Client
 
 
 sock = Client()
-sock.connect('localhost', 7003)
 
 sock.on('connect', lambda data: print('connected to server'))
 
